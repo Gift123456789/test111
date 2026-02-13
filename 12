@@ -1,0 +1,341 @@
+import React from 'react';
+import { 
+  Home, 
+  BookOpen, 
+  MessageCircle, 
+  FileText, 
+  Users, 
+  MessageSquare, 
+  BarChart2, 
+  Search,
+  Lightbulb,
+  ChevronDown,
+  Monitor
+} from 'lucide-react';
+import { 
+  PieChart, Pie, Cell, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+
+// --- Data for Charts ---
+
+// 1. Donut Chart Data (Mocking the 4 charts)
+const donutData1 = [
+  { name: 'Answered', value: 100 },
+  { name: 'Pending', value: 172 },
+];
+const donutData2 = [
+  { name: 'Type A', value: 80 },
+  { name: 'Type B', value: 33 },
+];
+const donutData3 = [
+  { name: 'Type X', value: 45 },
+  { name: 'Type Y', value: 20 },
+];
+const donutData4 = [
+  { name: 'Oral', value: 70 },
+  { name: 'Written', value: 24 },
+];
+
+const COLORS_DONUT = ['#00C49F', '#FF8042', '#0088FE', '#FFBB28'];
+const COLORS_MAIN = ['#4ade80', '#f87171', '#94a3b8']; // Green, Red, Gray
+
+// 2. Stacked Bar Data (Original Requirement)
+const sessionData = [
+  { name: 'ปีที่ 2 สมัยสามัญ 1', ตอบแล้ว: 15, รอตอบ: 8, ตกไป: 0 },
+  { name: 'ปีที่ 2 สมัยสามัญ 2', ตอบแล้ว: 33, รอตอบ: 19, ตกไป: 0 },
+  { name: 'ปีที่ 3 สมัยสามัญ 1', ตอบแล้ว: 6, รอตอบ: 36, ตกไป: 0 },
+];
+
+// 3. New Chart: Questions by Sector
+const sectorData = [
+  { name: 'ที่ดิน', count: 45 },
+  { name: 'สิ่งแวดล้อม', count: 32 },
+  { name: 'เกษตร', count: 58 },
+  { name: 'คมนาคม', count: 40 },
+  { name: 'น้ำ', count: 28 },
+  { name: 'เศรษฐกิจ', count: 69 },
+];
+
+// --- Components ---
+
+const SidebarItem = ({ icon: Icon, label, active }) => (
+  <div className={`flex flex-col items-center justify-center py-4 cursor-pointer transition-colors ${active ? 'bg-white/10 border-l-4 border-white' : 'hover:bg-white/5'}`}>
+    <Icon className="w-6 h-6 text-white mb-2" />
+    <span className="text-xs text-white text-center px-2">{label}</span>
+  </div>
+);
+
+const StatBox = ({ label, count, colorClass, iconLabel }) => (
+  <div className={`flex flex-col items-center p-2 rounded-lg bg-gray-50 border ${colorClass} min-w-[100px]`}>
+    <div className="flex justify-between w-full mb-1">
+      <span className={`text-[10px] px-2 py-0.5 rounded text-white ${colorClass.replace('border', 'bg').replace('200', '500')}`}>
+        {iconLabel}
+      </span>
+      <span className="text-[10px] text-gray-400">อ่านทั้งหมด</span>
+    </div>
+    <span className={`text-2xl font-bold ${colorClass.replace('border-', 'text-').replace('200', '600')}`}>
+      {count}
+    </span>
+  </div>
+);
+
+const DonutCard = ({ title, count, data, colorInfo }) => (
+  <div className="flex flex-col items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative">
+    <h3 className="text-gray-500 text-sm mb-2 text-center bg-gray-200 rounded-full px-3 py-1 w-full truncate">
+      {title}
+    </h3>
+    <div className="relative h-40 w-full flex justify-center items-center">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={40}
+            outerRadius={60}
+            fill="#8884d8"
+            paddingAngle={2}
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={colorInfo[index % colorInfo.length]} />
+            ))}
+          </Pie>
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-3xl font-bold text-gray-700">{count}</span>
+        <span className="text-[10px] text-gray-500">กระทู้ถามทั้งหมด</span>
+      </div>
+    </div>
+  </div>
+);
+
+export default function App() {
+  return (
+    <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
+      {/* Sidebar - Color #CCAD53 requested */}
+      <aside className="w-24 flex-shrink-0 flex flex-col shadow-lg z-20 overflow-y-auto" style={{ backgroundColor: '#CCAD53' }}>
+        <div className="p-4 flex flex-col items-center border-b border-white/20 bg-black/10">
+          <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-2 shadow-md">
+            <span className="text-[#E9B32C] font-bold text-xs text-center leading-tight">SENATE<br/>Intel</span>
+          </div>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto custom-scrollbar">
+          <SidebarItem icon={Home} label="หน้าหลัก" />
+          <SidebarItem icon={BookOpen} label="รายงานพิจารณาศึกษา" />
+          <SidebarItem icon={MessageCircle} label="กระทู้ถาม" active={true} />
+          <SidebarItem icon={FileText} label="การเสนอญัตติ" />
+          <SidebarItem icon={Search} label="การติดตามการพิจารณา" />
+          <SidebarItem icon={Users} label="การปรึกษาหารือ" />
+          <SidebarItem icon={MessageSquare} label="การรับเรื่องร้องทุกข์" />
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        {/* Header Banner - Color #E9B32C requested */}
+        <header className="h-32 relative flex items-center px-8 shadow-md shrink-0" style={{ backgroundColor: '#E9B32C' }}>
+          {/* Decorative Thai-style silhouettes (simulated with shapes) */}
+          <div className="absolute bottom-0 right-0 w-1/2 h-full opacity-30 pointer-events-none overflow-hidden">
+             <div className="absolute bottom-0 right-10 w-20 h-40 bg-white rounded-t-full transform translate-y-10"></div>
+             <div className="absolute bottom-0 right-36 w-10 h-24 bg-white transform rotate-45 translate-y-10"></div>
+             <div className="absolute bottom-0 right-52 w-16 h-32 bg-white rounded-t-lg translate-y-5"></div>
+          </div>
+          
+          <div className="flex items-center z-10 gap-4">
+             <div className="w-20 h-20 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                <img src="https://img2.pic.in.th/Seal_of_the_Parliament_of_Thailand.svg.png" alt="Senate Logo" className="w-full h-full object-contain p-1" />
+             </div>
+             <div>
+               <h1 className="text-3xl font-bold flex items-center gap-2 text-white">
+                 <span className="text-white text-4xl">›</span> กระทู้ถาม
+               </h1>
+               <p className="text-white/90 text-sm">Dashboard กระบวนงานควบคุมการบริหารราชการแผ่นดิน</p>
+             </div>
+          </div>
+        </header>
+
+        {/* Scrollable Dashboard Content */}
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
+          <div className="max-w-7xl mx-auto space-y-6">
+
+            {/* Top Filters & Stats Row */}
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+              <div className="flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm border border-gray-200">
+                {/* Changed background color to #3C5153 as requested */}
+                <span className="text-white px-3 py-1.5 rounded-md text-sm font-bold" style={{ backgroundColor: '#3C5153' }}>
+                  สมัยนายกรัฐมนตรี
+                </span>
+                <div className="relative">
+                  <select className="appearance-none bg-gray-50 border border-gray-300 text-gray-700 py-1.5 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-sm font-medium min-w-[200px]">
+                    <option>นางสาวแพทองธาร ชินวัตร</option>
+                    <option>เศรษฐา ทวีสิน</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <ChevronDown className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4 items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100 ml-auto">
+                <span className="text-sm font-bold text-gray-600 mr-2">กระทู้ถาม ทั้งหมด 272 กระทู้</span>
+                <StatBox count={111} label="ตอบแล้ว" iconLabel="ตอบแล้ว" colorClass="border-green-200 text-green-600" />
+                <StatBox count={66} label="รอตอบ" iconLabel="รอตอบ" colorClass="border-red-200 text-red-600" />
+                <StatBox count={95} label="ตกไป" iconLabel="ตกไป" colorClass="border-gray-200 text-gray-500" />
+              </div>
+            </div>
+
+            {/* Donuts Grid - Modified to 2 columns on large screens */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DonutCard 
+                title="กระทู้ถามทั้งหมด" 
+                count={272} 
+                data={donutData1} 
+                colorInfo={['#60a5fa', '#f87171', '#34d399', '#fca5a5']} 
+              />
+              <DonutCard 
+                title="กระทู้ถามที่เป็นหนังสือขอให้ตอบในที่ประชุมวุฒิสภา" 
+                count={113} 
+                data={donutData2} 
+                colorInfo={['#ef4444', '#4ade80']} 
+              />
+              <DonutCard 
+                title="กระทู้ถามที่เป็นหนังสือขอให้ตอบในราชกิจจานุเบกษา" 
+                count={65} 
+                data={donutData3} 
+                colorInfo={['#fbbf24', '#4ade80']} 
+              />
+              <DonutCard 
+                title="กระทู้ถามด้วยวาจา" 
+                count={94} 
+                data={donutData4} 
+                colorInfo={['#f87171', '#4ade80']} 
+              />
+            </div>
+
+            {/* Main Charts Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Left Column: Sector Analysis (Removed Knowledge Button from here) */}
+              <div className="lg:col-span-1 space-y-6">
+                
+                {/* 1. Bar Chart: Sector Analysis */}
+                <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <BarChart2 className="w-5 h-5 text-indigo-600" />
+                    <h3 className="font-bold text-gray-700">จำนวนกระทู้แยกรายด้าน</h3>
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart layout="vertical" data={sectorData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                        <XAxis type="number" hide />
+                        <YAxis dataKey="name" type="category" width={80} tick={{fontSize: 12}} />
+                        <Tooltip 
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        />
+                        <Bar dataKey="count" fill="#8884d8" radius={[0, 4, 4, 0]}>
+                          {sectorData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'][index % 6]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: Stacked Bar Chart */}
+              <div className="lg:col-span-2 bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                <div className="flex justify-between items-center mb-6">
+                   <h3 className="font-bold text-gray-600 bg-gray-200 px-4 py-1 rounded-full text-sm">
+                     ผลการดำเนินงานของกระทู้ถามด้วยวาจาแยกตามสมัยประชุม
+                   </h3>
+                   <div className="flex gap-2 text-xs">
+                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#4ade80]"></span> ตอบแล้ว</span>
+                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#fbbf24]"></span> รอตอบ</span>
+                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f87171]"></span> ตกไป</span>
+                   </div>
+                </div>
+                
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={sessionData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="name" tick={{fontSize: 12}} />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="ตกไป" stackId="a" fill="#f87171" barSize={50} />
+                      <Bar dataKey="รอตอบ" stackId="a" fill="#4ade80" barSize={50} />
+                      <Bar dataKey="ตอบแล้ว" stackId="a" fill="#FF0000" barSize={50} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Moved Knowledge Button to Bottom - Updated Color to Light Blue -> Blue (Gradient) */}
+            <div className="w-full">
+              <button className="w-full group bg-gradient-to-r from-sky-400 to-blue-700 hover:from-sky-500 hover:to-blue-800 text-white rounded-2xl p-4 shadow-lg transform transition-all hover:scale-[1.01] flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/20 p-3 rounded-full">
+                      <Lightbulb className="w-8 h-8 text-white" strokeWidth={2.5} />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-bold text-white drop-shadow-sm">องค์ความรู้เกี่ยวกับกระทู้</h3>
+                    <p className="text-white/80 text-xs">Infographic, Video, Podcast</p>
+                  </div>
+                </div>
+                <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+                  คลิกเลย
+                </div>
+              </button>
+            </div>
+
+          </div>
+          
+          {/* Footer Stats - Removed left text */}
+          <footer className="mt-8 pb-8 px-6 max-w-7xl mx-auto flex flex-col md:flex-row justify-end items-end text-xs text-gray-500 border-t pt-4">
+             {/* Left side text removed */}
+             
+             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 min-w-[200px]">
+                <h4 className="font-bold flex items-center gap-2 mb-2 text-gray-700">
+                  <Monitor className="w-4 h-4" /> สถิติผู้เข้าชมเว็บไซต์
+                </h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between">
+                    <span>ผู้ใช้งานวันนี้:</span>
+                    <span className="font-mono font-bold">4 คน</span>
+                  </div>
+                   <div className="flex justify-between">
+                    <span>ผู้ใช้งานเมื่อวาน:</span>
+                    <span className="font-mono font-bold">7 คน</span>
+                  </div>
+                   <div className="flex justify-between">
+                    <span>ผู้ใช้งานเดือนนี้:</span>
+                    <span className="font-mono font-bold">47 คน</span>
+                  </div>
+                   <div className="flex justify-between">
+                    <span>ผู้ใช้งานปีนี้:</span>
+                    <span className="font-mono font-bold">1,413 คน</span>
+                  </div>
+                  <div className="border-t pt-1 mt-1 flex justify-between text-indigo-600 font-bold">
+                    <span>รวม:</span>
+                    <span className="font-mono">5,100 คน</span>
+                  </div>
+                </div>
+             </div>
+          </footer>
+
+        </div>
+      </main>
+    </div>
+  );
+}
